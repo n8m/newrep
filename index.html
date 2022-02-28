@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+
+        .game{
+            display: flex;
+        }
+
+        .cell{
+            width: 50px;
+            height: 50px;
+            background-color: #ccc;
+            margin: 5px;
+        }
+        .cell .content {
+            display: none;
+        }
+        .cell.open .content {
+            display: inline-block;
+        }
+
+    </style>
+
+</head>
+<body>
+        <div class="game">
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+            <div class="cell"></div>
+        </div>
+
+        <h1>Ходов: <span class="step-counter"></span></h1>
+
+        <script>
+            const game = {
+                stepCounterEl: document.querySelector('.step-counter'),
+                cells: [1,2,3,4,5,6,7,8,6,8,5,7,4,3,1,2],
+                init: function(){
+
+                    console.log('gameinit');
+
+                    const gameElem = document.querySelector('.game');
+                    this.cells.forEach((value, index) => {
+                        let content = `<span class="content" id=${index}>${value}</span>`
+                        gameElem.children[index].innerHTML = content;
+                        gameElem.children[index].addEventListener('click', this.userDidStepHandler.bind(this))
+                    })
+                },
+                userDidStepHandler: function(e){
+
+                    console.log('clicked');
+
+                    const clicked = {
+                        DOMel: e.target,
+                        index: e.target.firstChild.getAttribute('id'),
+                        value: e.target.firstChild.innerText
+                    }
+
+                    clicked.DOMel.classList.add('open');
+
+                    if(this.progress.stepCounter % 2 === 0){
+                        this.progress.curClicked = clicked;
+                        let removeListener = clicked.DOMel.cloneNode(true);
+                        clicked.DOMel.parentNode.replaceChild(removeListener, clicked.DOMel);
+                        this.progress.curClicked.DOMel = removeListener;
+
+                        console.log(this.progress);
+
+                    }else{
+                        if(this.progress.curClicked.value !== clicked.value) {
+                            setTimeout(function(){
+                                clicked.DOMel.classList.remove('open');
+                                this.progress.curClicked.DOMel.classList.remove('open');
+                                this.progress.curClicked.DOMel.addEventListener('click', this.userDidStepHandler.bind(this))
+                                this.progress.curClicked = null;
+                            }.bind(this),1000)
+                        }else{
+                            let removeListener = clicked.DOMel.cloneNode(true);
+                            clicked.DOMel.parentNode.replaceChild(removeListener, clicked.DOMel);
+                            this.progress.curClicked = null;
+                            this.progress.pairsLeft--;
+
+                            if(this.progress.pairsLeft === 0) {
+                                document.querySelector('.game').innerHTML = "YOUWIN!";
+                            }
+
+                        }
+                    }
+
+                    this.stepCounterEl.innerHTML = ++this.progress.stepCounter;
+
+                },
+                progress:{
+                    stepCounter: 0,
+                    curClicked: null,
+                    pairsLeft: 8
+                }
+            }
+
+            game.init();
+
+        </script>
+
+</body>
+</html>
